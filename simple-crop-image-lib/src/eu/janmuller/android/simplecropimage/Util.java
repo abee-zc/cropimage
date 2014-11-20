@@ -218,15 +218,47 @@ public class Util {
         return options;
     }
 
-    // Thong added for rotate
-    public static Bitmap rotateImage(Bitmap src, float degree) {
-        // create new matrix
-        Matrix matrix = new Matrix();
-        // setup rotation degree
-        matrix.postRotate(degree);
-        Bitmap bmp = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
-        return bmp;
-    }
+    // LWP added for rotate
+	public static Bitmap rotateImage(String filePath, Bitmap srcBitmap) {
+		ExifInterface exif = null;
+		try {
+			exif = new ExifInterface(filePath);
+		} catch (IOException e) {
+			LogUtil.e(e);
+		}
+		float degree = 0F;
+		if (exif != null) {
+			switch (exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)) {
+			case ExifInterface.ORIENTATION_ROTATE_90:
+				degree = 90F;
+				break;
+			case ExifInterface.ORIENTATION_ROTATE_180:
+				degree = 180F;
+				break;
+			case ExifInterface.ORIENTATION_ROTATE_270:
+				degree = 270F;
+				break;
+			default:
+				break;
+			}
+		}
+		return rotateImage(srcBitmap, degree);
+	}
+
+	public static Bitmap rotateImage(Bitmap srcBitmap, float degrees) {
+		if (degrees != 0F && srcBitmap != null) {
+			Matrix matrix = new Matrix();
+			matrix.setRotate(degrees);
+			Bitmap bitmap = Bitmap.createBitmap(srcBitmap, 0, 0, srcBitmap.getWidth(), srcBitmap.getHeight(), matrix, true);
+			if (srcBitmap != null && bitmap != null) {
+				srcBitmap.recycle();
+				srcBitmap = null;
+			}
+			return bitmap;
+		} else {
+			return srcBitmap;
+		}
+	}
 
     public static int getOrientationInDegree(Activity activity) {
 
