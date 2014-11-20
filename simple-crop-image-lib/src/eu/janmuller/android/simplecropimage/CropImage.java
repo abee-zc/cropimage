@@ -238,7 +238,7 @@ public class CropImage extends MonitoredActivity {
             Bitmap b = BitmapFactory.decodeStream(in, null, o2);
             in.close();
 
-            return b;
+            return Util.rotateImage(mImagePath, b);
         } catch (FileNotFoundException e) {
             Log.e(TAG, "file " + path + " not found");
         } catch (IOException e) {
